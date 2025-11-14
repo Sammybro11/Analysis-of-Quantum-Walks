@@ -1,0 +1,51 @@
+import numpy as np
+import scipy.sparse as sp
+from typing import Sequence
+
+class Hamiltonian:
+    def __init__(self, Num_sites: int, defected: bool = False, def_sites: Sequence[int] = []):
+        self.N = Num_sites
+        diagonal = np.zeros((3, self.N), dtype=float)
+        diagonal[1, :] = 2.0                   # main diagonal
+        diagonal[0, 1:] = -1.0                 # upper diag
+        diagonal[2, :-1] = -1.0                # lower diag
+        offsets = [1, 0, -1]
+        self.Hamiltonian = sp.diags_array(diagonal, offsets).asformat("csr") # type: ignore[arg-type]
+
+    def addDefects(self, def_sites: list[int], defect_str: float):
+        Defected_Hamiltonian = self.Hamiltonian.copy().astype(complex)
+        for site in def_sites:
+            Defected_Hamiltonian[site, site] += defect_str
+        self.Hamiltonian = Defected_Hamiltonian
+
+class Wavefunction:
+    def __init__(self, Num_sites: int, center: float, spread: float, momentum: float ):
+        if momentum >= np.pi:
+            raise ValueError("Momentum can't be more than pi")
+
+        self.N = Num_sites
+        self.sites = np.arange(self.N)
+        self.psi = np.exp(- (self.sites - center)**2 / (2 * spread**2)) * np.exp(1j * momentum * self.sites)
+        self.psi /= np.linalg.norm(self.psi)
+
+class Evolver:
+    def __init__(self, Hamiltonian, Wavefunction):
+        self.Hamiltonian = Hamiltonian
+        self.Wavefunction = Wavefunction
+
+        self.H = getattr(Hamiltonian, "Hamiltonian")
+        self.psi = getattr(Wavefunction, "psi")
+
+    def run(self, times):
+        times = np.asarray(times)
+        if times.ndim != 1 or times.size == 0:
+            raise ValueError("Boy that times better be an array")
+
+        nt = times.size
+
+        vectors = sp.linalg.expm_multiply(-1j * self.H, self.psi, start = times[0], stop = times[-1], num = nt)
+
+        vectors = np.asarray(vectors)
+        print(vectors.shape)
+
+        return vectors
