@@ -5,12 +5,11 @@ from typing import Sequence
 class Hamiltonian:
     def __init__(self, Num_sites: int):
         self.N = Num_sites
-        diagonal = np.zeros((3, self.N), dtype=float)
-        diagonal[1, :] = 2.0                   # main diagonal
-        diagonal[0, 1:] = -1.0                 # upper diag
-        diagonal[2, :-1] = -1.0                # lower diag
+        main = 2.0 * np.ones(self.N)                   # main diagonal
+        off_diag = -1.0 * np.ones(self.N - 1)
         offsets = [1, 0, -1]
-        self.Hamiltonian = sp.diags_array(diagonal, offsets).asformat("csr") # type: ignore[arg-type]
+
+        self.Hamiltonian = sp.diags([off_diag, main, off_diag], offsets, format="csr")
 
     def addDefects(self, def_sites: list[int], defect_str: float):
         Defected_Hamiltonian = self.Hamiltonian.copy().astype(complex)
@@ -70,7 +69,7 @@ class Evolver:
         prob_between = np.sum(probs[:, between_idx], axis = 1)
         prob_right = np.sum(probs[:, right_idx], axis = 1)
 
-        return prob_left, prob_between, prob_right
+        return np.array([prob_left, prob_between, prob_right])
 
     def run_analyze(self, times, site0: int, site1: int, buffer: int):
         vectors = Evolver.run(self, times)

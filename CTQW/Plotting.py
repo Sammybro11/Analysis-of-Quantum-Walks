@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from pathlib import Path
 
 def ProbEvol(times: np.ndarray, region: np.ndarray, labels: list[str] = ["Left", "Between", "Right"]):
     fig, ax = plt.subplots(figsize = (10, 9))
+    path = Path("Plots/Evolution.png")
 
     for i in range(region.shape[0]):
         ax.plot(times, region[i], label = labels[i])
@@ -12,10 +14,13 @@ def ProbEvol(times: np.ndarray, region: np.ndarray, labels: list[str] = ["Left",
     ax.set_title("Region Probabilities vs Time")
     ax.legend()
     ax.grid(True)
-    plt.show()
+    plt.savefig(path, bbox_inches = "tight")
+
+
 
 def ProbDist(probability_dist: np.ndarray, t_index: int):
     nt, N = probability_dist.shape
+    path = Path("Plots/Distribution")
 
     fig, ax = plt.subplots(figsize = (10, 9))
 
@@ -23,4 +28,4 @@ def ProbDist(probability_dist: np.ndarray, t_index: int):
     ax.set_xlabel("Lattice")
     ax.set_ylabel("Probability Distribution")
     ax.grid(True)
-    plt.show()
+    plt.savefig(path, bbox_inches = "tight")
