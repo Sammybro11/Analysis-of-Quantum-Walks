@@ -2,44 +2,90 @@ import numpy as np
 import Core
 import Plotting
 
-def main():
-    N = 400               # number of lattice sites
-    center = 80          # center of initial Gaussian
-    spread = 15           # width of Gaussian
-    momentum = 0.8        # phase gradient / k
-
-    # Defects
-    def_positions = [150, 250]
-    defect_strength = 4.0
-    buffer = 2
+def localization():
+    N = 501               # number of lattice sites
+    center = 250          # Center of Starting Wavefunction
+    defect_strength = -2.0  # Defect Strength
 
     # Time grid
+    t_max = 100
+    times = np.linspace(0, t_max, t_max + 1, dtype = int)
+
+    # Hamiltonians 
+    H_free = Core.Hamiltonian(N)
+    H_defected = Core.Hamiltonian(N)
+    H_defected.addDefects([center], defect_strength)
+
+    Psi = Core.Wavefunction(gaussian= False, Num_sites = N, center = center) 
+
+    Evo_free = Core.Evolver(H_free, Psi)
+    Evo_defected = Core.Evolver(H_defected, Psi)
+
+    vecs_free, prob_free = Evo_free.run(times)
+    vecs_defected, prob_defected = Evo_defected.run(times)
+    probs = np.stack([prob_free, prob_defected])
+
+    Plotting.ProbDistAnimate(probs, times, "Localization_Combined", 0.22)
+
+def reflection():
+    N = 1001
+    defect_site = 600
+    defect_strength = 1.0
+    center = 400
+    spread = 25
+    momentum = 1.5
+    t_max = 300
+
+    times = np.linspace(0, t_max, t_max + 1, dtype = int)
+
+    H_free = Core.Hamiltonian(N)
+    H_defected = Core.Hamiltonian(N)
+    H_defected.addDefects([defect_site], defect_strength)
+
+    Psi = Core.Wavefunction(gaussian= True, 
+                            Num_sites = N, 
+                            center = center, 
+                            spread = spread, 
+                            momentum = momentum ) 
+
+    Evo_free = Core.Evolver(H_free, Psi)
+    Evo_defected = Core.Evolver(H_defected, Psi)
+
+    vecs_free, prob_free = Evo_free.run(times)
+    vecs_defected, prob_defected = Evo_defected.run(times)
+    probs = np.stack([prob_free, prob_defected])
+
+    Plotting.ProbDistAnimate(probs, times, "Reflection_Combined", 0.1)
+
+def trapping():
+    N = 1001
+    defect_sites = [400, 600]
+    defect_strength = 8.0
+
+    center = 500
+    spread = 15
+    momentum = 1.0
     t_max = 250
-    nt = 300
-    times = np.linspace(0, t_max, nt)
+    times = np.linspace(0, t_max, t_max + 1, dtype = int)
 
+    H_free = Core.Hamiltonian(N)
+    H_defected = Core.Hamiltonian(N)
+    H_defected.addDefects(defect_sites, defect_strength)
 
-    # --- Create system ---
-    H = Core.Hamiltonian(N)
-    H.addDefects(def_positions, defect_strength)
+    Psi = Core.Wavefunction(gaussian= True, 
+                            Num_sites = N, 
+                            center = center, 
+                            spread = spread, 
+                            momentum = momentum ) 
 
-    psi = Core.Wavefunction(N, center, spread, momentum)
+    Evo_defected = Core.Evolver(H_defected, Psi)
 
-    # Set up evolution manager
-    evo = Core.Evolver(H, psi)
+    vecs_defected, prob_defected = Evo_defected.run(times)
+    probs = np.stack([prob_defected])
 
-
-    # --- Run evolution ---
-    vecs, probs, regions = evo.run_analyze(times, def_positions[0], def_positions[1], buffer)
-
-
-    # --- Plot results ---
-    print("Plotting region probabilities vs time...")
-    Plotting.ProbEvol(times, regions)
-
-    print("Plotting probability distribution at t_index = 100...")
-    Plotting.ProbDist(probs, t_index=100)
-
+    Plotting.ProbDistAnimate(probs, times, "Trapping_Combined", 0.1)
 
 if __name__ == "__main__":
-    main()
+    localization()
+    reflection()
+    trapping()
