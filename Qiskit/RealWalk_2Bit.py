@@ -8,11 +8,6 @@ from qiskit_aer import AerSimulator
 from qiskit_aer.noise import NoiseModel
 from qiskit_ibm_runtime import QiskitRuntimeService
 
-QiskitRuntimeService.save_account(
-    token="S7kc7mn6NgAPwTz-xbrvzwQwVlDQjZTbt3c2doXlPT_g",
-    instance="open-instance",
-    overwrite=True
-)
 def step_gate(circ, coin, q):
     circ.h(coin[0])
     circ.cx(coin[0], q[1])
