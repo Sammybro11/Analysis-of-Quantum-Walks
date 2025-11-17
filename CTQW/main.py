@@ -32,6 +32,32 @@ def reflection():
     defect_site = 600
     defect_strength = 1.0
     center = 400
+    t_max = 300
+
+    times = np.linspace(0, t_max, t_max + 1, dtype = int)
+
+    H_free = Core.Hamiltonian(N)
+    H_defected = Core.Hamiltonian(N)
+    H_defected.addDefects([defect_site], defect_strength)
+
+    Psi = Core.Wavefunction(gaussian= False, 
+                            Num_sites = N, 
+                            center = center, )
+
+    Evo_free = Core.Evolver(H_free, Psi)
+    Evo_defected = Core.Evolver(H_defected, Psi)
+
+    vecs_free, prob_free = Evo_free.run(times)
+    vecs_defected, prob_defected = Evo_defected.run(times)
+    probs = np.stack([prob_free, prob_defected])
+
+    Plotting.ProbDistAnimate(probs, times, "Reflection_Delta", 0.1)
+
+def reflection_gaussian():
+    N = 1001
+    defect_site = 600
+    defect_strength = 1.0
+    center = 400
     spread = 25
     momentum = 1.5
     t_max = 300
@@ -55,9 +81,33 @@ def reflection():
     vecs_defected, prob_defected = Evo_defected.run(times)
     probs = np.stack([prob_free, prob_defected])
 
-    Plotting.ProbDistAnimate(probs, times, "Reflection_Combined", 0.1)
+    Plotting.ProbDistAnimate(probs, times, "Reflection_Gaussian", 0.1)
 
 def trapping():
+    N = 1001
+    defect_sites = [400, 600]
+    defect_strength = 8.0
+
+    center = 500
+    t_max = 250
+    times = np.linspace(0, t_max, t_max + 1, dtype = int)
+
+    H_free = Core.Hamiltonian(N)
+    H_defected = Core.Hamiltonian(N)
+    H_defected.addDefects(defect_sites, defect_strength)
+
+    Psi = Core.Wavefunction(gaussian= False, 
+                            Num_sites = N, 
+                            center = center,) 
+
+    Evo_defected = Core.Evolver(H_defected, Psi)
+
+    vecs_defected, prob_defected = Evo_defected.run(times)
+    probs = np.stack([prob_defected])
+
+    Plotting.ProbDistAnimate(probs, times, "Trapping_Delta", 0.1)
+
+def trapping_gaussian():
     N = 1001
     defect_sites = [400, 600]
     defect_strength = 8.0
@@ -83,9 +133,11 @@ def trapping():
     vecs_defected, prob_defected = Evo_defected.run(times)
     probs = np.stack([prob_defected])
 
-    Plotting.ProbDistAnimate(probs, times, "Trapping_Combined", 0.1)
+    Plotting.ProbDistAnimate(probs, times, "Trapping_Gaussian", 0.1)
 
 if __name__ == "__main__":
     localization()
     reflection()
     trapping()
+    reflection_gaussian()
+    trapping_gaussian()
