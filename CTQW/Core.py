@@ -10,10 +10,10 @@ class Hamiltonian:
 
         self.Hamiltonian = np.diag(main, 0) + np.diag(off_diag, -1) + np.diag(off_diag, +1)
 
-    def addDefects(self, def_sites: list[int], defect_str: float):
+    def addDefects(self, def_sites: list[int], defect_str: list[float]):
         Defected_Hamiltonian = self.Hamiltonian.copy().astype(complex)
-        for site in def_sites:
-            Defected_Hamiltonian[site, site] += defect_str
+        for site, strength in zip(def_sites, defect_str):
+            Defected_Hamiltonian[int(site), int(site)] += strength
         self.Hamiltonian = Defected_Hamiltonian
 
 class Wavefunction:

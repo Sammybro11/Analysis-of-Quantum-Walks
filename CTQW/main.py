@@ -14,7 +14,7 @@ def localization():
     # Hamiltonians 
     H_free = Core.Hamiltonian(N)
     H_defected = Core.Hamiltonian(N)
-    H_defected.addDefects([center], defect_strength)
+    H_defected.addDefects([center], [defect_strength])
 
     Psi = Core.Wavefunction(gaussian= False, Num_sites = N, center = center) 
 
@@ -23,8 +23,8 @@ def localization():
 
     vecs_free, prob_free = Evo_free.run(times)
     vecs_defected, prob_defected = Evo_defected.run(times)
-    probs = np.stack([prob_free, prob_defected])
 
+    probs = np.stack([prob_free, prob_defected])
     Plotting.ProbDistAnimate(probs, times, "Localization_Combined", 0.22)
 
 def reflection():
@@ -38,7 +38,7 @@ def reflection():
 
     H_free = Core.Hamiltonian(N)
     H_defected = Core.Hamiltonian(N)
-    H_defected.addDefects([defect_site], defect_strength)
+    H_defected.addDefects([defect_site], [defect_strength])
 
     Psi = Core.Wavefunction(gaussian= False, 
                             Num_sites = N, 
@@ -66,7 +66,7 @@ def reflection_gaussian():
 
     H_free = Core.Hamiltonian(N)
     H_defected = Core.Hamiltonian(N)
-    H_defected.addDefects([defect_site], defect_strength)
+    H_defected.addDefects([defect_site], [defect_strength])
 
     Psi = Core.Wavefunction(gaussian= True, 
                             Num_sites = N, 
@@ -83,10 +83,13 @@ def reflection_gaussian():
 
     Plotting.ProbDistAnimate(probs, times, "Reflection_Gaussian", 0.1)
 
+    vec_vectors = np.stack([vecs_free, vecs_defected])   # shape (2, nt, N)
+    Plotting.MomentumDistAnimate(vec_vectors, times, "Reflection_Gaussian_Momentum")
+
 def trapping():
     N = 1001
     defect_sites = [400, 600]
-    defect_strength = 8.0
+    defect_strength = [8.0, 8.0]
 
     center = 500
     t_max = 250
@@ -101,16 +104,18 @@ def trapping():
                             center = center,) 
 
     Evo_defected = Core.Evolver(H_defected, Psi)
+    Evo_free = Core.Evolver(H_free, Psi)
 
+    vecs_free, prob_free = Evo_free.run(times)
     vecs_defected, prob_defected = Evo_defected.run(times)
-    probs = np.stack([prob_defected])
 
+    probs = np.stack([prob_free, prob_defected])
     Plotting.ProbDistAnimate(probs, times, "Trapping_Delta", 0.1)
 
 def trapping_gaussian():
     N = 1001
     defect_sites = [400, 600]
-    defect_strength = 8.0
+    defect_strength = [8.0, 8.0]
 
     center = 500
     spread = 15
@@ -129,15 +134,59 @@ def trapping_gaussian():
                             momentum = momentum ) 
 
     Evo_defected = Core.Evolver(H_defected, Psi)
+    Evo_free = Core.Evolver(H_free, Psi)
 
+    vecs_free, prob_free = Evo_free.run(times)
     vecs_defected, prob_defected = Evo_defected.run(times)
-    probs = np.stack([prob_defected])
 
+    probs = np.stack([prob_free, prob_defected])
     Plotting.ProbDistAnimate(probs, times, "Trapping_Gaussian", 0.1)
 
+    vec_vectors = np.stack([vecs_free, vecs_defected])   # shape (2, nt, N)
+    Plotting.MomentumDistAnimate(vec_vectors, times, "Trapping_Gaussian_Momentum")
+
+# def resonance_gaussian():
+#     N = 1001
+#     defect_strength = [1.0, -1.0]
+#
+#     center = 300
+#     spread = 15
+#     momentum = 1.45
+#     L = int(10 * np.pi / momentum + np.pi/(2* momentum))
+#     t_max = 250
+#     times = np.linspace(0, t_max, t_max + 1, dtype = int)
+#     defect_sites = [400, 400 + L]
+#
+#     H_free = Core.Hamiltonian(N)
+#     H_defected = Core.Hamiltonian(N)
+#     H_defected.addDefects(defect_sites, defect_strength)
+#
+#     Psi = Core.Wavefunction(gaussian= True, 
+#                             Num_sites = N, 
+#                             center = center, 
+#                             spread = spread, 
+#                             momentum = momentum ) 
+#
+#     Evo_defected = Core.Evolver(H_defected, Psi)
+#     Evo_free = Core.Evolver(H_free, Psi)
+#
+#     vecs_free, prob_free = Evo_free.run(times)
+#     vecs_defected, prob_defected = Evo_defected.run(times)
+#
+#     trans_prob = prob_defected[-1][400+L:].sum()
+#     print(trans_prob)
+#
+#
+#     probs = np.stack([prob_free, prob_defected])
+#     Plotting.ProbDistAnimate(probs, times, "Resonance", 0.1)
+#
+#     vec_vectors = np.stack([vecs_free, vecs_defected])   # shape (2, nt, N)
+#     Plotting.MomentumDistAnimate(vec_vectors, times, "Resonance_Gaussian_Momentum")
+#
 if __name__ == "__main__":
     localization()
     reflection()
     trapping()
     reflection_gaussian()
     trapping_gaussian()
+    # resonance_gaussian()
