@@ -1,4 +1,5 @@
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, transpile
+import qiskit
 from qiskit_aer import AerSimulator
 
 def step_gate(circ, coin, q):
@@ -25,7 +26,7 @@ for i in range(N_STEPS - 2):
 qc.measure(pos[1], creg[0])  # MSB -> bit 0
 qc.measure(pos[0], creg[1])  # LSB -> bit 1
 
-# print(qc.draw(output="text"))
+print(qc.draw(output="text"))
 
 sim = AerSimulator()
 tqc = transpile(qc, sim)

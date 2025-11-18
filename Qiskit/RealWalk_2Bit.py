@@ -23,6 +23,11 @@ def build_walk(n_steps):
 
     qc = QuantumCircuit(pos, coin, creg)
 
+    if n_steps == 0:
+        qc.measure(pos[1], creg[0])  # MSB
+        qc.measure(pos[0], creg[1])  # LSB
+        return qc, ['00', '01', '10', '11']
+
     step_gate(qc, coin, pos)
     step_gate(qc, coin, pos)
 
@@ -120,7 +125,7 @@ def run_experiments(step_list, shots=2048, noisy=True, real=False):
     os.makedirs("qw_results_2bit/", exist_ok=True)
     OUTCOMES = ['00', '01', '10', '11']
     if noisy:
-        noise_model, backend = make_noise("ibm_marrakesh")
+        noise_model, backend = make_noise("ibm_fez")
         tqc = transpile(qc_temp, backend)
 
         backend_errors = extract_backend_errors(backend, tqc)

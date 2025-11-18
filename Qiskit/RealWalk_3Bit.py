@@ -163,7 +163,7 @@ def run_experiments(step_list, shots=2048, noisy=True):
 
     os.makedirs("qw_results_3bit/", exist_ok = True)
     if noisy:
-        noise_model, backend = make_noise("ibm_marrakesh")
+        noise_model, backend = make_noise("ibm_torino")
         tqc = transpile(qc_temp, backend)
 
         backend_errors = extract_backend_errors(backend, tqc)
