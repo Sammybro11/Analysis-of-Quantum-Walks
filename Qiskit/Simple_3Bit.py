@@ -5,7 +5,7 @@ import numpy as np
 # Parameters
 
 Nbits = 3
-step = 8
+step = 1
 
 qr = QuantumRegister(Nbits, "pos")
 coin = QuantumRegister(1, "coin")
@@ -61,6 +61,6 @@ def Simulate(circ):
     return result
 
 BuildCirc(circuit, step)
-print(circuit.draw(output = 'text'))
+circuit.draw(output = 'mpl', filename = "qw_results_3bit/circuit.png" )
 result_sim = Simulate(circuit)
 print("Sim Results: ", result_sim.get_counts(circuit))
