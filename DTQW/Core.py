@@ -71,12 +71,12 @@ class Wavefunction:
     If gaussian==False: it creates a localized state at 'center' with equal coin amplitudes.
     If gaussian==True: creates a Gaussian position envelope times e^{i k j}, with coin chosen as right-moving default.
     """
-    def __init__(self, gaussian: bool, Num_sites: int, center: int ):
+    def __init__(self, gaussian: bool, Num_sites: int, center: int, coin_init: np.ndarray = np.array([1.0, 0.0 + 1.0j], dtype=complex) / np.sqrt(2)):
         self.N = Num_sites
         self.sites = np.arange(self.N)
         # localized at center, equal superposition in coin (normalized)
         psi = np.zeros(2 * self.N, dtype=complex)
-        coin_state = np.array([1.0, 0.0 + 1.0j], dtype=complex) / np.sqrt(2)
+        coin_state = coin_init
         psi[2*center + 0] = coin_state[0]
         psi[2*center + 1] = coin_state[1]
         psi /= np.linalg.norm(psi)
@@ -101,7 +101,7 @@ class Evolver:
         if self.U.shape[0] != 2 * self.Wavefunction.N:
             raise ValueError("Unitary dimension mismatch vs wavefunction length")
 
-    def run(self, times: Sequence[int]):
+    def run(self, times: np.ndarray):
         """
         times: 1D integer-like sequence (e.g., np.arange(0, tmax+1))
         Returns: (vectors, probability)
