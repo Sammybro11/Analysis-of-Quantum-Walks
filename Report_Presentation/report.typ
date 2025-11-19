@@ -1,17 +1,21 @@
-#import "@preview/basic-report:0.3.1": *
+// #import "@preview/basic-report:0.3.1": *
+#import "@preview/red-agora:0.1.2": project
 #import "@preview/quill:0.7.2": *
 
-
-#show: it => basic-report(
-  doc-category: "Project Report",
-  doc-title: "Quantum Walks in Lattices with Defects",
-  author: "Samyak Rai",
-  affiliation: "Indian Institute of Technology, Hyderabad",
-  // logo: image("", width: 2cm),
-  language: "en",
-  compact-mode: false,
-  heading-font: "Fira Sans",
-  it
+#show: project.with(
+  title: "Analysis of Quantum Walks in Defected Lattices",
+  subtitle: "Mathematical Physics Project",
+  authors: (
+    "Samyak Rai",
+    "EP24BTECH11026",
+    "Engineering Physics"
+  ),
+  mentors: (
+    "Prof. Sangkha Borah",
+  ),
+  branch: "IIT Hyderabad",
+  academic-year: "2025-2026",
+  footer-text: "IITH"
 )
 
 = Introduction
@@ -30,11 +34,6 @@ In this report, we study the scattering properties of quantum walks, including l
 In particular, we investigate the roles played by the potential defects in CTQW and the phase defects in DTQW with respect to the control of quantum walk behaviors.@Intro_Yin 
 
 We also explore the real life implementation of DTQW on cyclic lattices and their accuracy and fidelity, to understand the current challenges faced by the industry in implementation of such models. We use Qiskit's Circuit designing methods and their Runtime Service Noise simulation models to give accurate representation of hardware.
-
-In the following report, @Sec2 contains the mathematical model for the two different kinds of Quantum Walks and their defects modeling. 
-Section 3 explores the various evolution properties of these walks based on (1) Localization, (2) Reflection and (3) Trapping of Quantum Walkers.
-Section 4 demonstrates the evolution on Quantum Walks on Cyclic Lattices using Quantum Circuits and compares them to Noisy models provided by Qiskit.
-Finally in Section 5, we describe our conclusions.
 
 = Mathematical Model <Sec2>
 
@@ -135,7 +134,6 @@ localized peaks, trapped probability between multiple barriers, or
 suppressed transmission.  These features will be central to our study
 of position defects in CTQWs.
 
-#pagebreak()
 
 = Effects of Lattice Defects
 
@@ -172,7 +170,7 @@ further modification of the initial coin state or changing the Hadamard coin to 
 Konno @Konno and Wojick et al. @Wojick have shown different forms of localization results by implementating different coins,
 Fourier coins by Luarita et al. @Laurita are also known to show increased localization. 
 This is an open problem as we explore different forms of coins and their localization properties.
-
+#pagebreak()
 == Reflection and Transmission Probability
 
 Next, we discuss the case where the single point defect is located away from where the quantum walk starts. 
@@ -275,10 +273,9 @@ Both Figs. 5(a) and 5(b) demonstrate similar behavior with the probability distr
 
 #figure(
     caption: text[Discrete time Quantum Walk with $phi = pi/2$. Trapped Probability inside the lattice defect sites as time progresses],
-    image("Trapped.png", width: 60%)
+    image("Trapped.png", width: 40%)
 )
 
-#pagebreak()
 
 = Quantum Circuits for Cyclic Lattices
 
@@ -299,6 +296,16 @@ qiskit-aer            0.17.2
 qiskit-ibm-runtime    0.43.1
 ```
 
+== Accuracy Metrics
+
+To measure the accuracy of the noise simulation we use a metric known as _Hellinger Distance_, it's range is $[0, 1]$ with maximum accuracy when Heliinger Distance is 0. It's defined as follows,
+
+For two probability distributions $P = (p_1, p_2, ..., p_k )$ and $Q = (q_1, q_2, ..., q_k)$ the hellinger distance between them is defined as, 
+$ cal(H)(P, Q) = sqrt(sum_i (sqrt(P(i)) - sqrt(Q(i)))^2) $
+It is equivalent to taking a euclidean norm between two vectors.
+
+Furthermore, we define another metric, known as the _Hellinger Fidelity_ which forms the probability counterpart for fidelity between two vectors, 
+$ cal(F)(P, Q) = (1 - cal(H)^2)^2 $
 
 == Four Node Cyclic Quantum Walk
 
@@ -346,9 +353,24 @@ This represents a single step in the 8 node walk, the gates used in this consist
 
 
 #figure(
-    caption: "Discrete time Quantum Walk for a 3 Qubit Lattice. Panels 1 - 7 show steps 1 to 7 of the walk respectively. The bars represent the probability of finding the walker at a specific node. Blue bars represent Ideal results and Red bars represent results from the Qiskit Noise Simulator",
-    image("plots_8node.png", width: 70%)
+    caption: "Discrete time Quantum Walk for a 3 Qubit Lattice. 
+ Panels 1 - 7 show steps 1 to 7 of the walk respectively. The bars represent the probability of finding the walker at a specific node. Blue bars represent Ideal results and Red bars represent results from the Qiskit Noise Simulator",
+    image("plots_8node.png", width: 90%)
 )
+#pagebreak()
+As the size of the position register increases, the quantum walk circuit grows substantially in depth and gate count.
+A walk on a cycle of $2^n$ nodes requires $n$ qubits for the position and an additional coin qubit.
+Each step of the walk applies:
+ - a coin operation, and
+ - a conditional shift implemented using multi-controlled increment/decrement operations on all $n$ position qubits.
+
+The cost of these multi-controlled updates grows roughly as $cal(O)(n dot.c "depth of "C n X)$, which already becomes considerable for $n >= 3$
+Even after decomposition into native two-qubit gates, a single walk step for an 8-node lattice involves dozens of CNOTs and controlled-phase operations. Because the walk must be iterated step-by-step, the circuit depth increases linearly with the number of time steps.
+
+For larger lattices, such as $N=100$ sites—which would require around seven position qubits—the problem becomes prohibitive.
+A single controlled shift on seven qubits requires deep decompositions into two-qubit gates, and performing even 20–30 time steps results in thousands of elementary operations.
+Contemporary NISQ devices cannot maintain coherent evolution over such depths, and even noise simulators struggle to capture the required error propagation realistically.
+Thus, while small (4- or 8-node) cyclic quantum walks can be reproduced faithfully, the simulation of large $100+$-site walks lies beyond the reach of present architectures due to the exponential growth in circuit complexity and error accumulation.
 
 = Conclusions
 
@@ -379,5 +401,7 @@ As quantum hardware matures and circuit depth limitations ease, such
 defect-engineered quantum walks may provide a practical route toward
 quantum simulation of disordered media, quantum transport, and
 interference-based sensing.
+
+#pagebreak()
 
 #bibliography("references.bib", style: "american-physics-society")
