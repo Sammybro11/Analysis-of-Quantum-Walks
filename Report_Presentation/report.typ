@@ -11,7 +11,7 @@
     "Engineering Physics"
   ),
   mentors: (
-    "Prof. Sangkha Borah",
+    "Dr. Sangkha Borah",
   ),
   branch: "IIT Hyderabad",
   academic-year: "2025-2026",
@@ -19,7 +19,6 @@
 )
 
 = Introduction
-
 Quantum walks are the quantum analog to the classical random walk, extended to take into account superposition, interference, and quantum correlations.
 It provides a comprehensive framework to study quantum dynamics in discrete and structured space. 
 Compared to the classical random walk, quantum walks exhibit markedly different behavior; for instance, a quantum walk can propagate quadratically faster than its classical counterpart, 
@@ -154,7 +153,7 @@ We implement a quantum walk starting at origin with a defect at the origin itsel
 The similarity of the DTQW and CTQW probability distributions in Fig. 1 suggests the possibility of manipulating the DTQW coin degrees of freedom, in an attempt to reproduce the CTQW physical effects attributed to the point defects.
 
 #figure(
-    caption: text[Probability at origin at time $t = 30$ as function of (a) defect potential $Gamma$, and (b) phase defect at origin $phi$ with different initial coin states $|0 angle.r + |1 angle.r$, $|0 angle.r$ and $|1 angle.r$ ( last to are superimposed)],
+    caption: text[Probability at origin at time $t = 30$ as function of (a) defect potential $Gamma$, and (b) phase defect at origin $phi$ with different initial coin states $|0 angle.r + |1 angle.r$, $|0 angle.r$ and $|1 angle.r$ ( last two are superimposed)],
     grid(columns: 2,
     [#image("CTQW_Defect_Origin.png")],
     [#image("DTQW_Defect_Origin.png")],
